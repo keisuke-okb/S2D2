@@ -1,4 +1,4 @@
-# S2D2: Simple Stable Diffusion using Diffusers
+# S2D2: Simple Stable Diffusion based on Diffusers
 Diffusers-based simple generating image module for jupyter notebook or python commandline
 
 ## Features
