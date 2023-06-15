@@ -62,7 +62,7 @@ image = generator.diffusion_enhance(
           decode_factor=0.15, # [15] Denominator when decoding latents. Used to adjust the saturation of the image during decoding.
           decode_factor_final=0.18215, # [16] Denominator when decoding final latents.
           )
-image.save("generate_image.jpg) # or just "image" for display image in jupyter
+image.save("generated_image.jpg) # or just "image" to display image in jupyter
 ```
 
 ### Correspondence of web ui and parameters
