@@ -66,7 +66,8 @@ image.save("generate_image.jpg) # or just "image" for display image in jupyter
 ```
 
 ### Correspondence of web ui and parameters
-![image](https://github.com/keisuke-okb/S2D2/assets/70097451/0389a313-f000-42ed-a549-ebcb5aeb8eec)
+![image](https://github.com/keisuke-okb/S2D2/assets/70097451/6b37aa08-70f9-4f69-a67a-63ac38a70b81)
+
 
 ### Parameters
 🚧🚧🚧🚧🚧Under construction🚧🚧🚧🚧🚧
@@ -78,12 +79,14 @@ image.save("generate_image.jpg) # or just "image" for display image in jupyter
 - Upscale factor: 1.8
 - Target resolution: 696x496(x1.8, nearest multiple of 8) = 1248x888
 
-### Multi-scale upscaling(Ex.4)
-Stepwise upscaling between the initial resolution and the target resolution.
-![image](https://github.com/keisuke-okb/S2D2/assets/70097451/2f2bb59b-405d-4214-9af5-ac5264cd1d54)
 
 ### 2-scale upscaling(Hires.fix)
-![image](https://github.com/keisuke-okb/S2D2/assets/70097451/8af64b21-1c32-40f6-be87-618859a2bf1f)
+![image](https://github.com/keisuke-okb/S2D2/assets/70097451/ca3db251-b6a5-48f1-ba26-8c8e68e97fcd)
+
+
+### Multi-scale upscaling(Ex.4)
+Stepwise upscaling between the initial resolution and the target resolution.
+![image](https://github.com/keisuke-okb/S2D2/assets/70097451/6b4c77bf-73be-4ef1-8ad0-6d66d5331c86)
 
 
 # References
