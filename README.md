@@ -1,5 +1,5 @@
 # S2D2: Simple Stable Diffusion based on Diffusers
-Diffusers-based simple generating image module for jupyter notebook or python commandline
+Diffusers-based simple generating image module with upscaling features for jupyter notebook, ipython or python interactive shell
 
 ## Features
 - ☑ Just prepare safetensors files to go (Fast loading)
