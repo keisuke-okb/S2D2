@@ -80,10 +80,10 @@ image.save("generated_image.jpg) # or just "image" to display image in jupyter
 - Target resolution: 696x496(x1.8, nearest multiple of 8) = 1248x888
 
 
-### 2-scale upscaling(Hires.fix)
+### 2-stage upscaling(Hires.fix)
 ![image](https://github.com/keisuke-okb/S2D2/assets/70097451/c53eb7b6-4878-466e-b769-f44dfdfce7fa)
 
-### Multi-scale upscaling(Ex.4)
+### N-stage upscaling(Ex.4)
 Stepwise upscaling between the initial resolution and the target resolution.
 ![image](https://github.com/keisuke-okb/S2D2/assets/70097451/fbacf8b8-37e8-41f6-9402-49ada9754522)
 
