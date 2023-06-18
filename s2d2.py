@@ -204,6 +204,23 @@ class StableDiffusionImageGenerator:
                     ]
             image = None
             now_str = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+
+            if enhance_steps == 1: # Single generation
+                image = self.diffusion_from_noise(
+                        prompt,
+                        negative_prompt,
+                        scheduler_name=scheduler_name,
+                        num_inference_steps=num_inference_steps, 
+                        guidance_scale=guidance_scale,
+                        width=w_final,
+                        height=h_final,
+                        output_type=output_type,
+                        decode_factor=decode_factor_final,
+                        seed=seed,
+                        save_path=os.path.join(save_dir, f"{now_str}.jpg")
+                    )
+                return image
+
             
             for i, (w, h) in enumerate(resolution_pairs):
 
@@ -223,7 +240,7 @@ class StableDiffusionImageGenerator:
                     )
                     continue
 
-                # Interpolate latent or image -> PIL image
+                # Step 2: Interpolate latent or image -> PIL image
                 if upscale_target == "latent":
                     image = torch.nn.functional.interpolate(
                             image,
@@ -231,15 +248,11 @@ class StableDiffusionImageGenerator:
                             mode=interpolate_mode,
                             antialias=True if antialias and interpolate_mode != "nearest" else False,
                         )
-                    image = 1 / decode_factor_final * image
-                    image = self.pipe_i2i.vae.decode(image).sample
-                    image = (image / 2 + 0.5).clamp(0, 1)
-                    image = image.cpu().permute(0, 2, 3, 1).float().numpy()
-                    image = numpy_to_pil(image)
-                    image = StableDiffusionPipelineOutput(images=image, nsfw_content_detected=None).images[0]
+                    image = self.decode_latents_to_PIL_image(image, decode_factor)
                 else:
                     image = image.resize((w, h), Image.Resampling.LANCZOS)
 
+                # Step 3: Generate image (i2i) 
                 if i < len(resolution_pairs) - 1:
                     image = self.diffusion_from_image(
                         prompt,
