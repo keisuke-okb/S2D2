@@ -86,7 +86,8 @@ image.save("generated_image.jpg) # or just "image" to display image in jupyter
 
 ### Multi-scale upscaling(Ex.4)
 Stepwise upscaling between the initial resolution and the target resolution.
-![image](https://github.com/keisuke-okb/S2D2/assets/70097451/6b4c77bf-73be-4ef1-8ad0-6d66d5331c86)
+![image](https://github.com/keisuke-okb/S2D2/assets/70097451/fbacf8b8-37e8-41f6-9402-49ada9754522)
+
 
 
 # References
