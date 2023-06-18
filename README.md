@@ -6,7 +6,7 @@ Diffusers-based simple generating image module with upscaling features for jupyt
 - ☑ Run Hires.fix without [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
   - ☑ Latent Upscaler
   - ☒ GAN models
-- ☑ Multi-level upscaling (extension of Hires.fix)
+- ☑ Multi-stage upscaling (extension of Hires.fix)
 - ☑ LoRA
 - ☒ Controlnet
 - ☒ Multi-batch generation (Only single generation is supported)
