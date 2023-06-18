@@ -11,6 +11,9 @@ Diffusers-based simple generating image module with upscaling features for jupyt
 - ☒ Controlnet
 - ☒ Multi-batch generation (Only single generation is supported)
 
+### Schedule
+- Add ControlNet (Convert SD safetensors file to diffusers model files)
+
 # Getting Started
 ## 1. Install libraries
 ```bash
