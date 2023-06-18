@@ -81,8 +81,7 @@ image.save("generated_image.jpg) # or just "image" to display image in jupyter
 
 
 ### 2-scale upscaling(Hires.fix)
-![image](https://github.com/keisuke-okb/S2D2/assets/70097451/ca3db251-b6a5-48f1-ba26-8c8e68e97fcd)
-
+![image](https://github.com/keisuke-okb/S2D2/assets/70097451/c53eb7b6-4878-466e-b769-f44dfdfce7fa)
 
 ### Multi-scale upscaling(Ex.4)
 Stepwise upscaling between the initial resolution and the target resolution.
