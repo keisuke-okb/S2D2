@@ -116,7 +116,7 @@ Stepwise upscaling between the initial resolution and the target resolution.
 ![image](https://github.com/keisuke-okb/S2D2/assets/70097451/fbacf8b8-37e8-41f6-9402-49ada9754522)
 
 
-# Comparison generating images without or with latent upscaling
+# Comparison of enerating images without or with latent upscaling
 - Without latent upscaling: Single generation@696x496
 - With latent upcscaling: 2-stage generation(like Hires.fix, 696x496 to 1248x888)
 
