@@ -9,6 +9,7 @@ from diffusers import (StableDiffusionPipeline,
                        StableDiffusionImg2ImgPipeline)
 from diffusers.utils import numpy_to_pil
 from diffusers.pipelines.stable_diffusion import StableDiffusionPipelineOutput
+from diffusers.models import AutoencoderKL
 
 import torch
 import datetime
@@ -47,21 +48,26 @@ class StableDiffusionImageGenerator:
     def __init__(
             self,
             sd_model_path: str,
+            vae_path: str=None,
             device: str="cuda",
             dtype: torch.dtype=torch.float16,
             is_enable_xformers: bool=True,
             custom_pipeline: str=None,
             ):
+        pipe_args={ "torch_dtype": dtype, "custom_pipeline": custom_pipeline}
+        pipe_i2i_args={ "torch_dtype": dtype, "custom_pipeline": custom_pipeline }
+        if vae_path is not None:
+          vae=AutoencoderKL.from_pretrained(vae_path, torch_dtype=dtype)
+          pipe_args.setdefault("vae", AutoencoderKL.from_pretrained(vae_path, torch_dtype=dtype))
+          pipe_i2i_args.setdefault("vae", AutoencoderKL.from_pretrained(vae_path, torch_dtype=dtype))
         self.device = torch.device(device)
         self.pipe = StableDiffusionPipeline.from_pretrained(
             sd_model_path,
-            torch_dtype=dtype,
-            custom_pipeline=custom_pipeline,
+            **pipe_args,
         ).to(device)
         self.pipe_i2i = StableDiffusionImg2ImgPipeline.from_pretrained(
             sd_model_path,
-            torch_dtype=dtype,
-            custom_pipeline=custom_pipeline,
+            **pipe_i2i_args,
         ).to(device)
         if is_enable_xformers:
           self.pipe.enable_xformers_memory_efficient_attention()
