@@ -54,21 +54,20 @@ class StableDiffusionImageGenerator:
             is_enable_xformers: bool=True,
             custom_pipeline: str=None,
             ):
-        vae=None
+        pipe_args={ torch_dtype: dtype, custom_pipeline: custom_pipeline}
+        pipe_i2i_args={ torch_dtype: dtype, custom_pipeline: custom_pipeline }
         if vae_path is not None:
-          vae = AutoencoderKL.from_pretrained(vae_path, torch_dtype=dtype)
+          vae=AutoencoderKL.from_pretrained(vae_path, torch_dtype=dtype)
+          pipe_args.setdefault("vae", AutoencoderKL.from_pretrained(vae_path, torch_dtype=dtype))
+          pipe_i2i_args.setdefault("vae", AutoencoderKL.from_pretrained(vae_path, torch_dtype=dtype))
         self.device = torch.device(device)
         self.pipe = StableDiffusionPipeline.from_pretrained(
             sd_model_path,
-            vae=vae,
-            torch_dtype=dtype,
-            custom_pipeline=custom_pipeline,
+            **pipe_args,
         ).to(device)
         self.pipe_i2i = StableDiffusionImg2ImgPipeline.from_pretrained(
             sd_model_path,
-            vae=vae,
-            torch_dtype=dtype,
-            custom_pipeline=custom_pipeline,
+            **pipe_i2i_args,
         ).to(device)
         if is_enable_xformers:
           self.pipe.enable_xformers_memory_efficient_attention()
