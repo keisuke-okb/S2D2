@@ -49,6 +49,7 @@ class StableDiffusionImageGenerator:
             sd_model_path: str,
             device: str="cuda",
             dtype: torch.dtype=torch.float16,
+            is_enable_xformers: bool=True,
             ):
         self.device = torch.device(device)
         self.pipe = StableDiffusionPipeline.from_pretrained(
@@ -59,10 +60,11 @@ class StableDiffusionImageGenerator:
             sd_model_path,
             torch_dtype=dtype,
         ).to(device)
-        self.pipe.enable_xformers_memory_efficient_attention()
-        self.pipe.enable_attention_slicing()
-        self.pipe_i2i.enable_xformers_memory_efficient_attention()
-        self.pipe_i2i.enable_attention_slicing()
+        if is_enable_xformers:
+          self.pipe.enable_xformers_memory_efficient_attention()
+          self.pipe.enable_attention_slicing()
+          self.pipe_i2i.enable_xformers_memory_efficient_attention()
+          self.pipe_i2i.enable_attention_slicing()
         self.pipe.safety_checker = None
         self.pipe_i2i.safety_checker = None
         return
