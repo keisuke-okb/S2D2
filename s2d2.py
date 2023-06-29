@@ -46,23 +46,28 @@ def calc_pix_8(x):
 class StableDiffusionImageGenerator:
     def __init__(
             self,
-            sd_safetensor_path: str,
+            sd_model_path: str,
             device: str="cuda",
             dtype: torch.dtype=torch.float16,
+            is_enable_xformers: bool=True,
+            custom_pipeline: str=None,
             ):
         self.device = torch.device(device)
-        self.pipe = StableDiffusionPipeline.from_ckpt(
-            sd_safetensor_path,
+        self.pipe = StableDiffusionPipeline.from_pretrained(
+            sd_model_path,
             torch_dtype=dtype,
+            custom_pipeline=custom_pipeline,
         ).to(device)
-        self.pipe_i2i = StableDiffusionImg2ImgPipeline.from_ckpt(
-            sd_safetensor_path,
+        self.pipe_i2i = StableDiffusionImg2ImgPipeline.from_pretrained(
+            sd_model_path,
             torch_dtype=dtype,
+            custom_pipeline=custom_pipeline,
         ).to(device)
-        self.pipe.enable_xformers_memory_efficient_attention()
-        self.pipe.enable_attention_slicing()
-        self.pipe_i2i.enable_xformers_memory_efficient_attention()
-        self.pipe_i2i.enable_attention_slicing()
+        if is_enable_xformers:
+          self.pipe.enable_xformers_memory_efficient_attention()
+          self.pipe.enable_attention_slicing()
+          self.pipe_i2i.enable_xformers_memory_efficient_attention()
+          self.pipe_i2i.enable_attention_slicing()
         self.pipe.safety_checker = None
         self.pipe_i2i.safety_checker = None
         return
