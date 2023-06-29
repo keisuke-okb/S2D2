@@ -2,7 +2,7 @@
 Diffusers-based simple generating image module with upscaling features for jupyter notebook, ipython or python interactive shell
 
 ## Features
-- ☑ Just prepare safetensors files to go
+- ☑ ~~Just prepare safetensors files to go~~
 - ☑ Run Hires.fix without [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
   - ☑ Latent Upscaler
   - ☒ GAN models
