@@ -35,8 +35,16 @@ jupyter notebook
 ## 4. Import main class and load LoRA(option)
 ```python
 from s2d2 import StableDiffusionImageGenerator
+
+# Setting Model (for pipeline.from_pretrained)
+model_path = "/content/drive/MyDrive/Model/fantasticmix"
+
+# Initialize Generator
 generator = StableDiffusionImageGenerator(
-    r"C:\xxx\Counterfeit-V30.safetensors",
+  model_path,
+  device="cuda",
+  is_enable_xformers=False,
+  custom_pipeline="lpw_stable_diffusion",
 )
 # Load LoRA (multi files)
 generator.load_lora(r"C:\xxx\lora_1.safetensors", alpha=0.2)
@@ -102,6 +110,7 @@ SCHEDULERS = {
 
 
 # Generated sample images
+- 
 - Used [Counterfeit-V30.safetensors](https://huggingface.co/gsdf/Counterfeit-V3.0/tree/main)
 - Initial resolution: 696x496
 - Upscale factor: 1.8
