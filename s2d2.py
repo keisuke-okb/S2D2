@@ -54,8 +54,8 @@ class StableDiffusionImageGenerator:
             is_enable_xformers: bool=True,
             custom_pipeline: str=None,
             ):
-        pipe_args={ torch_dtype: dtype, custom_pipeline: custom_pipeline}
-        pipe_i2i_args={ torch_dtype: dtype, custom_pipeline: custom_pipeline }
+        pipe_args={ "torch_dtype": dtype, "custom_pipeline": custom_pipeline}
+        pipe_i2i_args={ "torch_dtype": dtype, "custom_pipeline": custom_pipeline }
         if vae_path is not None:
           vae=AutoencoderKL.from_pretrained(vae_path, torch_dtype=dtype)
           pipe_args.setdefault("vae", AutoencoderKL.from_pretrained(vae_path, torch_dtype=dtype))
