@@ -50,7 +50,7 @@ class StableDiffusionImageGenerator:
             device: str="cuda",
             dtype: torch.dtype=torch.float16,
             is_enable_xformers: bool=True,
-            custom_pipeline: str,
+            custom_pipeline: str=None,
             ):
         self.device = torch.device(device)
         self.pipe = StableDiffusionPipeline.from_pretrained(
