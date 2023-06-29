@@ -20,8 +20,7 @@ Diffusers-based simple generating image module with upscaling features for jupyt
 pip install -r requirements.txt
 ```
 
-## 2. Prepare safetensors files of SD models and LoRA(option)
-- Only safetensors file is supported.
+## 2. Prepare files of SD models and LoRA(option)
 - Place the files in the directory of your choice.
 
 Ex. 
