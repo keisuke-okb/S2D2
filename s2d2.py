@@ -46,17 +46,17 @@ def calc_pix_8(x):
 class StableDiffusionImageGenerator:
     def __init__(
             self,
-            sd_safetensor_path: str,
+            sd_model_path: str,
             device: str="cuda",
             dtype: torch.dtype=torch.float16,
             ):
         self.device = torch.device(device)
-        self.pipe = StableDiffusionPipeline.from_ckpt(
-            sd_safetensor_path,
+        self.pipe = StableDiffusionPipeline.from_pretrained(
+            sd_model_path,
             torch_dtype=dtype,
         ).to(device)
-        self.pipe_i2i = StableDiffusionImg2ImgPipeline.from_ckpt(
-            sd_safetensor_path,
+        self.pipe_i2i = StableDiffusionImg2ImgPipeline.from_pretrained(
+            sd_model_path,
             torch_dtype=dtype,
         ).to(device)
         self.pipe.enable_xformers_memory_efficient_attention()
