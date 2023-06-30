@@ -5,8 +5,12 @@ import torch
 from PIL import Image
 
 import diffusers
-from diffusers import (StableDiffusionPipeline, 
-                       StableDiffusionImg2ImgPipeline)
+from diffusers import (
+                        StableDiffusionPipeline, 
+                        StableDiffusionImg2ImgPipeline,
+                        StableDiffusionControlNetPipeline,
+                        ControlNetModel,
+                      )
 from diffusers.utils import numpy_to_pil
 from diffusers.pipelines.stable_diffusion import StableDiffusionPipelineOutput
 from diffusers.models import AutoencoderKL
@@ -49,6 +53,7 @@ class StableDiffusionImageGenerator:
             self,
             sd_model_path: str,
             vae_path: str=None,
+            controlnet_path: str=None,
             device: str="cuda",
             dtype: torch.dtype=torch.float16,
             is_enable_xformers: bool=True,
@@ -56,19 +61,27 @@ class StableDiffusionImageGenerator:
             ):
         pipe_args={ "torch_dtype": dtype, "custom_pipeline": custom_pipeline}
         pipe_i2i_args={ "torch_dtype": dtype, "custom_pipeline": custom_pipeline }
+          
         if vae_path is not None:
           vae=AutoencoderKL.from_pretrained(vae_path, torch_dtype=dtype)
           pipe_args.setdefault("vae", AutoencoderKL.from_pretrained(vae_path, torch_dtype=dtype))
           pipe_i2i_args.setdefault("vae", AutoencoderKL.from_pretrained(vae_path, torch_dtype=dtype))
+
+        if controlnet_path is not None:
+          controlnet_path="lllyasviel/sd-controlnet-scribble" # scribble only(temporary)
+          pipe_args.setdefault("controlnet", ControlNetModel.from_pretrained(controlnet_path, torch_dtype=dtype))
+
         self.device = torch.device(device)
-        self.pipe = StableDiffusionPipeline.from_pretrained(
-            sd_model_path,
-            **pipe_args,
-        ).to(device)
-        self.pipe_i2i = StableDiffusionImg2ImgPipeline.from_pretrained(
-            sd_model_path,
-            **pipe_i2i_args,
-        ).to(device)
+
+        # t2i
+        if controlnet_path is None:
+          self.pipe = StableDiffusionPipeline.from_pretrained(sd_model_path, **pipe_args).to(device)
+        else:
+          self.pipe = StableDiffusionControlNetPipeline.from_pretrained(sd_model_path, **pipe_args).to(device)
+
+        # i2i
+        self.pipe_i2i = StableDiffusionImg2ImgPipeline.from_pretrained(sd_model_path, **pipe_i2i_args).to(device)
+              
         if is_enable_xformers:
           self.pipe.enable_xformers_memory_efficient_attention()
           self.pipe.enable_attention_slicing()
@@ -99,6 +112,7 @@ class StableDiffusionImageGenerator:
             self,
             prompt,
             negative_prompt,
+            controlnet_image=None,
             scheduler_name="dpm++_2m_karras",
             num_inference_steps=20, 
             guidance_scale=9.5,
@@ -115,16 +129,21 @@ class StableDiffusionImageGenerator:
         seed = random.randint(1, 1000000000) if seed == -1 else seed
 
         with torch.no_grad():
-            latents = self.pipe(
-                prompt=prompt, 
-                negative_prompt=negative_prompt,
-                num_inference_steps=num_inference_steps, 
-                generator=torch.manual_seed(seed),
-                guidance_scale=guidance_scale,
-                width=width,
-                height=height,
-                output_type="latent"
-            ).images # 1x4x(W/8)x(H/8)
+            args = dict(
+              prompt=prompt, 
+              negative_prompt=negative_prompt,
+              num_inference_steps=num_inference_steps, 
+              generator=torch.manual_seed(seed),
+              guidance_scale=guidance_scale,
+              width=width,
+              height=height,
+              output_type="latent"
+            )
+          
+            if controlnet_image is not None:
+              args.setdefault("image", controlnet_image)
+          
+            latents = self.pipe(**args).images # 1x4x(W/8)x(H/8)
 
             if save_path is not None:
                 pil_image = self.decode_latents_to_PIL_image(latents, decode_factor)
@@ -137,7 +156,7 @@ class StableDiffusionImageGenerator:
                 return self.decode_latents_to_PIL_image(latents, decode_factor)
             else:
                 raise NotImplementedError()
-        
+  
     def diffusion_from_image(
             self,
             prompt,
@@ -186,6 +205,7 @@ class StableDiffusionImageGenerator:
             self,
             prompt,
             negative_prompt,
+            controlnet_image=None,
             scheduler_name="dpm++_2m_karras",
             num_inference_steps=20,
             num_inference_steps_enhance=20,
@@ -218,37 +238,51 @@ class StableDiffusionImageGenerator:
             now_str = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
 
             if enhance_steps == 1: # Single generation
+                args=dict(
+                  scheduler_name=scheduler_name,
+                  num_inference_steps=num_inference_steps, 
+                  guidance_scale=guidance_scale,
+                  width=w_final,
+                  height=h_final,
+                  output_type=output_type,
+                  decode_factor=decode_factor_final,
+                  seed=seed,
+                  save_path=os.path.join(save_dir, f"{now_str}.jpg")                  
+                )
+
+                if controlnet_image is not None:
+                    args.setdefault("controlnet_image", controlnet_image)              
+
                 image = self.diffusion_from_noise(
                         prompt,
                         negative_prompt,
-                        scheduler_name=scheduler_name,
-                        num_inference_steps=num_inference_steps, 
-                        guidance_scale=guidance_scale,
-                        width=w_final,
-                        height=h_final,
-                        output_type=output_type,
-                        decode_factor=decode_factor_final,
-                        seed=seed,
-                        save_path=os.path.join(save_dir, f"{now_str}.jpg")
-                    )
+                        **args,
+                )
                 return image
 
             
             for i, (w, h) in enumerate(resolution_pairs):
 
                 if image is None: # Step 1: Generate low-quality image
+                    args=dict(
+                      scheduler_name=scheduler_name,
+                      num_inference_steps=num_inference_steps, 
+                      guidance_scale=guidance_scale,
+                      width=w,
+                      height=h,
+                      output_type=upscale_target,
+                      decode_factor=decode_factor,
+                      seed=seed,
+                      save_path=os.path.join(save_dir, f"{now_str}_{i}.jpg")
+                    )
+                          
+                    if controlnet_image is not None:
+                        args.setdefault("controlnet_image", controlnet_image)
+                    
                     image = self.diffusion_from_noise(
                         prompt,
                         negative_prompt,
-                        scheduler_name=scheduler_name,
-                        num_inference_steps=num_inference_steps, 
-                        guidance_scale=guidance_scale,
-                        width=w,
-                        height=h,
-                        output_type=upscale_target,
-                        decode_factor=decode_factor,
-                        seed=seed,
-                        save_path=os.path.join(save_dir, f"{now_str}_{i}.jpg")
+                        **args,
                     )
                     continue
 
