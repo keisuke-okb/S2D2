@@ -8,11 +8,12 @@ Diffusers-based simple generating image module with upscaling features for jupyt
   - ☒ GAN models
 - ☑ Multi-stage upscaling (extension of Hires.fix)
 - ☑ LoRA
-- ☒ Controlnet
+- ☑ Controlnet
 - ☒ Multi-batch generation (Only single generation is supported)
 
 ### Schedule
-- Add ControlNet (Convert SD safetensors file to diffusers model files)
+- Add Multi-ControlNet
+- Add Weighting Prompts (compel)
 
 # Getting Started
 ## 1. Install libraries
@@ -31,7 +32,7 @@ cd s2d2
 jupyter notebook
 ```
 
-## 4. Import main class and load LoRA(option)
+## 4. Import main class and load options(LoRA and VAE and Controlnet)
 ```python
 from s2d2 import StableDiffusionImageGenerator
 
@@ -41,9 +42,11 @@ model_path = "/content/drive/MyDrive/Model/fantasticmix"
 # Initialize Generator
 generator = StableDiffusionImageGenerator(
   model_path,
+  vae_path=vae_path,
+  controlnet_path="lllyasviel/sd-controlnet-scribble",
   device="cuda",
   is_enable_xformers=False,
-  custom_pipeline="lpw_stable_diffusion",
+  # custom_pipeline="lpw_stable_diffusion",
 )
 # Load LoRA (multi files)
 generator.load_lora(r"C:\xxx\lora_1.safetensors", alpha=0.2)
@@ -52,9 +55,19 @@ generator.load_lora(r"C:\xxx\lora_2.safetensors", alpha=0.15)
 
 ## 5. Generate image using enhance features(Hires.fix and its extended upscaling)
 ```python
+from diffusers.utils import load_image
+from controlnet_aux import HEDdetector
+
+simage_name = '/content/drive/MyDrive/target.png'#@param {type:"string"}
+hed = HEDdetector.from_pretrained('lllyasviel/Annotators')
+
+simage = load_image(simage_name)
+simage = hed(simage, scribble=True)
+
 image = generator.diffusion_enhance(
           prompt,
           negative_prompt,
+          controlnet_image=simage,
           scheduler_name="dpm++_2m_karras", # [1]
           num_inference_steps=20, # [2]
           num_inference_steps_enhance=20, # [3]
