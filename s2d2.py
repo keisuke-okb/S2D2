@@ -68,7 +68,6 @@ class StableDiffusionImageGenerator:
           pipe_i2i_args.setdefault("vae", AutoencoderKL.from_pretrained(vae_path, torch_dtype=dtype))
 
         if controlnet_path is not None:
-          controlnet_path="lllyasviel/sd-controlnet-scribble" # scribble only(temporary)
           pipe_args.setdefault("controlnet", ControlNetModel.from_pretrained(controlnet_path, torch_dtype=dtype))
 
         self.device = torch.device(device)
