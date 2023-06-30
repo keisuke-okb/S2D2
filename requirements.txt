@@ -2,3 +2,4 @@ torch
 safetensors
 diffusers
 xformers
+controlnet_aux
